@@ -8,10 +8,11 @@ import {
   useLocation,
 } from "react-router-dom";
 import { getCurrentUser, fetchAuthSession, signOut } from "aws-amplify/auth";
-import { Hub } from 'aws-amplify/utils';
+import { Hub } from "aws-amplify/utils";
 import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
 import ConfirmSignUpPage from "./pages/ConfirmSignUpPage";
+import HomePage from "./pages/HomePage"; // <-- Import HomePage
 import TodoListPage from "./pages/TodoListPage";
 import "./styles/App.css"; // Import App styles
 
@@ -50,17 +51,25 @@ function App() {
       console.log("User is authenticated:", currentUser.username);
 
       // Redirect check
+      // --- NEW: Redirect authenticated users trying to access public pages ---
       if (
-        ["/login", "/signup", "/confirm-signup"].includes(location.pathname)
+        ["/home", "/login", "/signup", "/confirm-signup"].includes(
+          location.pathname
+        )
       ) {
-        console.log("Redirecting authenticated user from public route to /");
-        navigate("/", { replace: true });
+        console.log("Redirecting authenticated user from public route to /app");
+        navigate("/app", { replace: true }); // Redirect to the app page
       }
     } catch (error) {
       // fetchAuthSession throws if not authenticated
       console.log("User is not authenticated (v6 check).");
       setIsAuthenticated(false);
       setUser(null);
+      // --- NEW: Redirect unauthenticated users trying to access protected page ---
+      if (location.pathname.startsWith("/app")) {
+        // If trying to access /app or subroutes
+        navigate("/login", { replace: true, state: { from: location } }); // Redirect to login
+      }
     } finally {
       setIsAuthLoading(false);
     }
@@ -68,47 +77,67 @@ function App() {
   }, [navigate, location.pathname]); // Add dependencies
 
   useEffect(() => {
-    checkAuthState(); // Initial check
+    checkAuthState();
 
-    // Hub listener (structure remains similar, but access Hub differently)
+    // listener returns a function to unsubscribe
     const listener = Hub.listen("auth", ({ payload }) => {
-      // Destructure payload
-      const { event, data } = payload; // Get event type and data
-      switch (event) {
+      // payload structure depends on the event type
+      console.log('Auth Hub Event:', payload.event); // Log just the event name initially
+
+      switch (payload.event) {
         case "signedIn":
-        case "autoSignIn": // Handle auto sign-in as well
-          console.log(`Auth event: ${event}`);
+          // 'signedIn' can happen from manual sign-in or potentially auto sign-in flows
+          console.log("Auth event: signedIn");
           checkAuthState();
           break;
+        // Note: 'autoSignIn' event might not be explicitly emitted in v6,
+        // successful session fetch often covers this. Check Amplify docs if needed.
+
         case "signedOut":
           console.log("Auth event: signedOut");
           setIsAuthenticated(false);
           setUser(null);
-          navigate("/login");
+          navigate("/home");
           break;
-        // v6 events might differ slightly, check documentation
-        case "signInWithRedirect":
-          console.log("Auth event: signInWithRedirect");
-          // Handle redirect scenarios if using hosted UI (not applicable here)
+
+        // Handling Sign-in Failures:
+        // Often, errors are better caught in the specific signIn function call's catch block.
+        // Hub might emit generic errors, but specific error handling in the component is usually preferred.
+        // Let's comment out the specific failure cases for now, as they caused TS errors.
+        // Check Amplify v6 Hub documentation for exact error event names/payloads if needed.
+        /*
+             case 'signIn_failure': // Might not exist or have different name/payload
+                 console.error(`Auth event: ${payload.event}`, payload.data); // Log the data if it exists
+                 setIsAuthenticated(false);
+                 setUser(null);
+                 break;
+             */
+
+        case "signInWithRedirect_failure": // Keep standard ones if needed
+          console.error(`Auth event: ${payload.event}`, payload.data);
+          // Handle redirect failures if using hosted UI
           break;
-        case "signInWithRedirect_failure":
-        case "signIn_failure": // Handle sign-in errors passed via Hub
-          console.error(`Auth event: ${event}`, data);
-          setIsAuthenticated(false);
-          setUser(null);
+
+        // Add other relevant cases based on Amplify v6 docs or observed logs
+        case "tokenRefresh":
+          console.log("Auth event: tokenRefresh");
+          // Session was refreshed, maybe update UI if needed, but checkAuthState likely covers it.
           break;
-        // Add other cases if needed
+        case "tokenRefresh_failure":
+          console.error("Auth event: tokenRefresh_failure", payload.data);
+          // Token refresh failed, user might need to sign in again.
+          checkAuthState(); // Re-check state, might lead to logout
+          break;
+
         default:
-          // console.log('Unhandled Auth Hub event:', event);
+          // console.log('Unhandled Auth Hub event:', payload.event);
           break;
       }
     });
 
-    // Cleanup listener
     return () => {
       console.log("Removing auth listener (v6)");
-      // Hub listener returns a function to unsubscribe
-      listener();
+      listener(); // Unsubscribe
     };
   }, [checkAuthState, navigate]);
 
@@ -130,7 +159,7 @@ function App() {
 
   // --- Protected Route Component ---
   // Renders child component if authenticated, otherwise redirects to login
-  const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
+  const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     if (!isAuthenticated) {
       console.log("ProtectedRoute: Not authenticated, redirecting to login");
       return <Navigate to="/login" state={{ from: location }} replace />;
@@ -138,11 +167,19 @@ function App() {
     return children;
   };
 
-  if (isAuthLoading) {
-    return <div className="loading-container">Authenticating...</div>;
+  if (
+    isAuthLoading &&
+    !["/home", "/login", "/signup", "/confirm-signup"].includes(
+      location.pathname
+    )
+  ) {
+    // Show loading only for initial load on potentially protected routes
+    // Allows public routes to render immediately even if auth check is pending
+    return <div className="loading-container">Loading...</div>;
   }
 
   // Extract email differently if needed, check 'user' object structure
+  // Extract email for display (remains the same)
   const userEmail = user
     ? user.signInDetails?.loginId || user.username
     : undefined;
@@ -150,21 +187,22 @@ function App() {
   return (
     <div className="App">
       <Routes>
-        {/* Public Routes */}
+        {/* --- Public Routes --- */}
+        <Route path="/home" element={<HomePage />} />
         <Route
           path="/login"
           element={
             !isAuthenticated ? (
               <LoginPage onLoginSuccess={handleAuthSuccess} />
             ) : (
-              <Navigate to="/" replace />
+              <Navigate to="/app" replace />
             )
           }
         />
         <Route
           path="/signup"
           element={
-            !isAuthenticated ? <SignUpPage /> : <Navigate to="/" replace />
+            !isAuthenticated ? <SignUpPage /> : <Navigate to="/app" replace />
           }
         />
         <Route
@@ -173,14 +211,14 @@ function App() {
             !isAuthenticated ? (
               <ConfirmSignUpPage />
             ) : (
-              <Navigate to="/" replace />
+              <Navigate to="/app" replace />
             )
           }
         />
 
-        {/* Protected Route */}
+        {/* --- Protected Route --- */}
         <Route
-          path="/"
+          path="/app" // Changed path to /app
           element={
             <ProtectedRoute>
               <TodoListPage onSignOut={handleSignOut} userEmail={userEmail} />
@@ -188,10 +226,13 @@ function App() {
           }
         />
 
-        {/* Catch-all Route */}
+        {/* --- Redirects and Catch-all --- */}
+        {/* Redirect root path to /home */}
+        <Route path="/" element={<Navigate to="/home" replace />} />
+        {/* Catch-all: Redirect unknown paths to home or app based on auth */}
         <Route
           path="*"
-          element={<Navigate to={isAuthenticated ? "/" : "/login"} replace />}
+          element={<Navigate to={isAuthenticated ? "/app" : "/home"} replace />}
         />
       </Routes>
     </div>
