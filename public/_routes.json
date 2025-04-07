@@ -2,13 +2,13 @@
     "version": 1,
     "include": ["/*"],
     "exclude": [
-       "/assets/*",    // Exclude your asset paths (adjust if different)
-       "/favicon.ico", // Add other specific files to exclude if needed
-       "/vite.svg"     // Example
+       "/assets/*",
+       "/favicon.ico",
+       "/vite.svg"
       ],
     "routes": [
       {
-        "src": "/.*", // Match any route
+        "src": "/.*",
         "dest": "/index.html",
         "status": 200
       }
