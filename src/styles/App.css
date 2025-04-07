@@ -1,0 +1,40 @@
+/* src/styles/App.css */
+.App {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 80vh; /* Ensure it takes up good portion of viewport */
+  }
+  
+  .loading-container,
+  .error-message {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 5px;
+  }
+  
+  .loading-container {
+      color: #aaa;
+  }
+  
+  .error-message {
+      color: #ff6b6b;
+      background-color: rgba(255, 107, 107, 0.1);
+      border: 1px solid rgba(255, 107, 107, 0.3);
+  }
+  
+  /* Header for TodoListPage */
+  .todo-header {
+      width: 100%;
+      max-width: 600px; /* Match list width */
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #444;
+  }
+  
+  .todo-header h1 {
+      margin: 0;
+  }

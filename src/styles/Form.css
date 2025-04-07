@@ -1,0 +1,73 @@
+/* src/styles/Form.css */
+.form-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    border: 1px solid #444;
+    border-radius: 8px;
+    margin-top: 30px;
+    background-color: #2c2c2c;
+    max-width: 400px; /* Limit form width */
+    width: 90%;
+  }
+  
+  .form-container h2 {
+    margin-bottom: 20px;
+  }
+  
+  .form-container form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+  
+  .form-container label {
+    margin-bottom: 5px;
+    font-weight: bold;
+    display: block; /* Make labels block */
+    width: 100%; /* Make labels take full width */
+    max-width: 280px; /* Match input width roughly */
+    text-align: left;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .form-container input {
+      width: 100%; /* Inputs take full width */
+      max-width: 280px;
+      box-sizing: border-box; /* Include padding/border in width */
+  }
+  
+  
+  .form-container button {
+    margin-top: 15px;
+    width: auto; /* Allow button to size naturally */
+    min-width: 150px;
+  }
+  
+  .form-link {
+    margin-top: 15px;
+    font-size: 0.9em;
+  }
+  
+  .form-link a {
+    color: #88aaff;
+    text-decoration: none;
+  }
+  
+  .form-link a:hover {
+    text-decoration: underline;
+  }
+  
+  /* Light mode adaptation */
+  @media (prefers-color-scheme: light) {
+      .form-container {
+          background-color: #f0f0f0;
+          border-color: #ccc;
+      }
+       .form-link a {
+          color: #0056b3;
+       }
+  }
