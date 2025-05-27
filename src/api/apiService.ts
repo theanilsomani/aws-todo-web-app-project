@@ -12,12 +12,26 @@ export interface Task {
   createdAt: string; // ISO Date string
   updatedAt: string; // ISO Date string
   entityType?: string; // Optional
+  isReminderSet?: boolean;  // <-- Optional property
+  reminderTime?: string;
+  reminderEmail?: string;
+  reminderMessage?: string;
 }
 
 export interface TaskUpdatePayload {
   taskText?: string;
   isCompleted?: boolean;
 }
+
+// --- New Interface for Reminder Payload ---
+export interface ReminderPayload {
+    taskId: string;
+    reminderTime?: string;      // ISO string e.g. 2025-12-01T09:00:00Z (UTC)
+    reminderEmail?: string;
+    reminderMessage?: string;
+    clearReminder?: boolean;    // To explicitly clear a reminder
+}
+
 
 // IMPORTANT: Replace with your actual Function URLs
 // Make sure they end with a '/' if that's how AWS provides them
@@ -26,23 +40,39 @@ const API_URLS = {
   list: import.meta.env.VITE_Function_URL_list,
   update: import.meta.env.VITE_Function_URL_update,
   delete: import.meta.env.VITE_Function_URL_delete,
+  setReminder: import.meta.env.VITE_SET_TASK_REMINDER_URL,
 };
 
+
 // Add console logs to verify IMMEDIATELY after definition
-// console.log("API URLs Loaded:", API_URLS);
-// if (
-//   !API_URLS.list ||
-//   !API_URLS.create ||
-//   !API_URLS.update ||
-//   !API_URLS.delete
-// ) {
-//   console.error(
-//     "!!! One or more API URLs are missing from environment variables (check .env file and VITE_ prefix) !!!"
-//   );
-//   // You might want to throw an error here or handle it more gracefully
-// }
+console.log("API URLs Loaded:", API_URLS);
+if (
+  !API_URLS.list ||
+  !API_URLS.create ||
+  !API_URLS.update ||
+  !API_URLS.delete ||
+  !API_URLS.setReminder
+) {
+  console.error(
+    "!!! One or more API URLs are missing from environment variables (check .env file and VITE_ prefix) !!!"
+  );
+  console.error("!!! One or more API URLs are missing (check .env and VITE_ prefix) !!!");
+  // You might want to throw an error here or handle it more gracefully
+}
 
 // --- Helper Functions ---
+
+// --- New API Function for Setting/Clearing Reminder ---
+export const setTaskReminderAPI = async (
+    payload: ReminderPayload
+): Promise<{ message: string, scheduleName?: string, taskAttributes?: Partial<Task> }> => {
+    if (!API_URLS.setReminder) throw new Error("Set Reminder API URL not configured");
+    return makeRequest<{ message: string, scheduleName?: string, taskAttributes?: Partial<Task> }>(
+        'POST',
+        API_URLS.setReminder,
+        payload
+    );
+};
 
 async function getAuthToken(): Promise<string | null> {
   try {
@@ -72,7 +102,7 @@ async function getAuthToken(): Promise<string | null> {
   }
 }
 
-async function makeRequest<T = any>( // Generic type T for expected response data
+async function makeRequest<T = unknown>( // Generic type T for expected response data
   method: "GET" | "POST" | "PUT" | "DELETE",
   url: string,
   body: Record<string, any> | null = null // Body can be any object
