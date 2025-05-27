@@ -45,20 +45,20 @@ const API_URLS = {
 
 
 // Add console logs to verify IMMEDIATELY after definition
-console.log("API URLs Loaded:", API_URLS);
-if (
-  !API_URLS.list ||
-  !API_URLS.create ||
-  !API_URLS.update ||
-  !API_URLS.delete ||
-  !API_URLS.setReminder
-) {
-  console.error(
-    "!!! One or more API URLs are missing from environment variables (check .env file and VITE_ prefix) !!!"
-  );
-  console.error("!!! One or more API URLs are missing (check .env and VITE_ prefix) !!!");
-  // You might want to throw an error here or handle it more gracefully
-}
+// console.log("API URLs Loaded:", API_URLS);
+// if (
+//   !API_URLS.list ||
+//   !API_URLS.create ||
+//   !API_URLS.update ||
+//   !API_URLS.delete ||
+//   !API_URLS.setReminder
+// ) {
+//   console.error(
+//     "!!! One or more API URLs are missing from environment variables (check .env file and VITE_ prefix) !!!"
+//   );
+//   console.error("!!! One or more API URLs are missing (check .env and VITE_ prefix) !!!");
+//   // You might want to throw an error here or handle it more gracefully
+// }
 
 // --- Helper Functions ---
 
