@@ -1,54 +1,147 @@
-# React + TypeScript + Vite
+### ✅ `README.md` – Serverless To-Do List App on AWS
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# 📝 Serverless To-Do List Web App (AWS Free Tier)
 
-Currently, two official plugins are available:
+Welcome to our open-source, full-stack **To-Do List Web App** powered entirely by **AWS Serverless Architecture** — built to stay within the **AWS Always Free Tier** and designed to showcase practical, secure, and scalable cloud development.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 📸 Architecture Overview
 
-## Expanding the ESLint configuration
+> ![AWS to-do web app architecture](src/image.png)
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 🚀 Features
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+* Sign up, log in, and manage personal to-dos
+* Set **email reminders** for upcoming tasks
+* Built entirely with **pay-as-you-go serverless services**
+* Deployed frontend via **Cloudflare Pages**
+
+---
+
+## 🛠️ Core AWS Services & Their Roles
+
+### 1. **Amazon Cognito – User Management & Authentication**
+
+* **Role:** Handles sign-up, login, and JWT token issuance
+* **Key Configuration:**
+
+  * **User Pool**: Manages all users
+  * **App Client**: Set as public client (no secret), ideal for SPAs
+
+### 2. **AWS Lambda – Serverless Backend Functions**
+
+* **Role:** Executes app logic (CRUD, reminders, notifications)
+* **Functions:**
+
+  * `createTaskLambda`, `listTasksLambda`, `updateTaskLambda`, `deleteTaskLambda`
+  * `setTaskReminderLambda`, `sendReminderNotificationLambda`
+
+### 3. **Lambda Function URLs – Direct API Endpoints**
+
+* **Role:** Public HTTPS endpoints to invoke each Lambda
+* **Security:** AuthType set to `NONE`; JWTs validated **inside** functions
+* **CORS:** Configured for Cloudflare Pages & local development
+
+### 4. **Amazon DynamoDB – NoSQL Database**
+
+* **Role:** Stores users and tasks using a **single-table design**
+* **Schema:**
+
+  * `PK`: e.g., `USER#<userId>`
+  * `SK`: e.g., `TASK#<taskId>`
+* Flexible schema enables reminder attributes without altering structure
+
+### 5. **Amazon EventBridge Scheduler – Reminder Engine**
+
+* **Role:** Schedules one-time task reminders
+* **Workflow:**
+
+  * Triggers `sendReminderNotificationLambda` at specified time
+  * Deletes itself after execution to stay within free tier limits
+
+### 6. **Amazon SNS – Email Notification Delivery**
+
+* **Role:** Sends reminder emails
+* **Workflow:**
+
+  * Lambda publishes reminder → SNS → Sends email to confirmed subscribers
+
+### 7. **Amazon CloudWatch – Logging & Monitoring**
+
+* **Role:** Collects logs from all Lambda functions for easy debugging
+
+---
+
+## 🔐 IAM Roles & Policies
+
+### 🔸 `LambdaTodoAppRole` (Worn by Lambda Functions)
+
+* **Permissions:**
+
+  * Full access to specific DynamoDB table
+  * CloudWatch Logs access
+  * EventBridge Scheduler management
+  * SNS publishing
+
+### 🔸 `EventBridgeSchedulerToLambdaRole`
+
+* **Used By:** EventBridge
+* **Permission:** Only invoke `sendReminderNotificationLambda`
+
+### 🔸 Lambda Function URL Resource Policies
+
+Each exposed function has a policy allowing public access via HTTPS:
+
+```json
+{
+  "Effect": "Allow",
+  "Principal": "*",
+  "Action": "lambda:InvokeFunctionUrl",
+  "Condition": {
+    "StringEquals": {
+      "lambda:FunctionUrlAuthType": "NONE"
+    }
+  }
+}
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+JWT-based auth is handled inside each function.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+---
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+## 🔁 How It Works
+
+### ➕ Creating a Task with a Reminder
+
+1. User logs in via React frontend (Cloudflare Pages)
+2. Frontend sends JWT + task data to `setTaskReminderLambda`
+3. Lambda:
+
+   * Validates JWT
+   * Updates DynamoDB with task & reminder
+   * Creates a one-time EventBridge schedule
+
+### ⏰ Sending Reminder Email
+
+1. EventBridge fires at scheduled time
+2. Triggers `sendReminderNotificationLambda`
+3. Lambda publishes message to `TaskRemindersTopic`
+4. SNS sends email to subscribed user
+
+---
+
+## 🌐 Frontend
+
+* Built with **React** + **Vite**
+* Hosted on **Cloudflare Pages**
+* Authenticates via AWS Cognito
+* Communicates with Lambda URLs via HTTPS + JWTs
+
+---
+
+## 💻 Local Development
+
+1. Clone the repo and install frontend dependencies
+2. Configure `.env` with AWS environment variables (Cognito IDs, Lambda URLs, etc.)
+3. Use tools like Postman or browser for testing Function URLs
+
+---
