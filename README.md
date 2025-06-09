@@ -6,7 +6,7 @@ Welcome to our open-source, full-stack **To-Do List Web App** powered entirely b
 
 ## 📸 Architecture Overview
 
-> ![AWS to-do web app architecture](src/image.png)
+> ![AWS to-do web app architecture](public/image.png)
 
 ## 🚀 Features
 
