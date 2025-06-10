@@ -1,12 +1,10 @@
-### ✅ `README.md` – Serverless To-Do List App on AWS
-
 # 📝 Serverless To-Do List Web App (AWS Free Tier)
 
 THis is a full-stack **To-Do List Web App** powered entirely by **AWS Serverless Architecture** — built to stay within the **AWS Always Free Tier** and designed to showcase practical, secure, and scalable cloud development.
 
 ## 🔗 Live Demo
 
-👉 [Try it Live](https://simple-to-do.pages.dev/home)
+👉 [https://simple-to-do.pages.dev/home](https://simple-to-do.pages.dev/home)
 
 ## 🧰 Tech Stack
 
