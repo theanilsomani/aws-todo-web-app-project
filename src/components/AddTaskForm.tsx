@@ -1,8 +1,7 @@
-// src/components/AddTaskForm.tsx
 import React, { useState } from 'react';
 
 interface AddTaskFormProps {
-  onAddTask: (taskText: string) => Promise<boolean>; // Returns true on success
+  onAddTask: (taskText: string) => Promise<boolean>; 
 }
 
 function AddTaskForm({ onAddTask }: AddTaskFormProps) {
@@ -12,14 +11,14 @@ function AddTaskForm({ onAddTask }: AddTaskFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const trimmedText = taskText.trim();
-    if (!trimmedText) return; // Don't add empty tasks
+    if (!trimmedText) return; 
 
     setIsAdding(true);
     const success = await onAddTask(trimmedText);
     setIsAdding(false);
 
     if (success) {
-      setTaskText(''); // Clear input only on successful add
+      setTaskText('');
     }
   };
 

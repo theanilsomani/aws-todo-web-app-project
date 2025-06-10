@@ -1,20 +1,19 @@
-// src/components/ReminderForm.tsx
 import React, { useState, useEffect } from "react";
-import { Task } from "../api/apiService"; // Assuming Task interface is exported
-import "../styles/Form.css"; // You might want specific styles or reuse
+import { Task } from "../api/apiService";
+import "../styles/Form.css";
 
 interface ReminderFormProps {
-  task: Task | null; // Pass the task being edited, or null if new
-  userEmail?: string; // Pre-fill email
+  task: Task | null; 
+  userEmail?: string; 
   onSetReminder: (details: {
-    reminderTime?: string; // UTC ISO String
+    reminderTime?: string; 
     reminderEmail?: string;
     reminderMessage?: string;
-  }) => Promise<void>; // Called when user submits new reminder details
-  onClearReminder: () => Promise<void>; // Called when user wants to clear
+  }) => Promise<void>; 
+  onClearReminder: () => Promise<void>; 
   onCancel: () => void;
-  isReminderSet?: boolean; // From task.isReminderSet
-  currentReminderTime?: string; // From task.reminderTime (UTC ISO String)
+  isReminderSet?: boolean; 
+  currentReminderTime?: string;
 }
 
 function ReminderForm({
@@ -26,8 +25,8 @@ function ReminderForm({
   isReminderSet,
   currentReminderTime,
 }: ReminderFormProps) {
-  const [date, setDate] = useState(""); // YYYY-MM-DD
-  const [time, setTime] = useState(""); // HH:MM (24-hour)
+  const [date, setDate] = useState(""); 
+  const [time, setTime] = useState(""); 
   const [email, setEmail] = useState(userEmail || "");
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -35,9 +34,7 @@ function ReminderForm({
 
   useEffect(() => {
     if (isReminderSet && currentReminderTime && task) {
-      // Added 'task' to dependency and check
       try {
-        // currentReminderTime is an ISO 8601 UTC string (e.g., "2025-05-11T10:00:00.000Z")
         const reminderDateTimeInUTC = new Date(currentReminderTime);
 
         if (isNaN(reminderDateTimeInUTC.getTime())) {
@@ -45,19 +42,15 @@ function ReminderForm({
             "Invalid currentReminderTime format:",
             currentReminderTime
           );
-          // Set to default if existing time is invalid
           setDefaultDateTime();
           return;
         }
 
-        // The <input type="date"> expects "YYYY-MM-DD"
-        // The <input type="time"> expects "HH:MM" (in local time of the browser)
 
-        // To display correctly in user's local time in the input fields:
         const localYear = reminderDateTimeInUTC.getFullYear();
         const localMonth = (reminderDateTimeInUTC.getMonth() + 1)
           .toString()
-          .padStart(2, "0"); // Month is 0-indexed
+          .padStart(2, "0"); 
         const localDay = reminderDateTimeInUTC
           .getDate()
           .toString()
@@ -77,25 +70,23 @@ function ReminderForm({
         setDate(datePart);
         setTime(timePart);
 
-        setEmail(task.reminderEmail || userEmail || ""); // Prioritize task's reminderEmail
-        setMessage(task.reminderMessage || ""); // Prioritize task's reminderMessage
+        setEmail(task.reminderEmail || userEmail || ""); 
+        setMessage(task.reminderMessage || "");
       } catch (e) {
         console.error(
           "Error parsing existing reminder time:",
           currentReminderTime,
           e
         );
-        setDefaultDateTime(); // Fallback to default if parsing fails
+        setDefaultDateTime();
       }
     } else {
       setDefaultDateTime();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isReminderSet, currentReminderTime, userEmail, task]); // Added task to dependency array
+  }, [isReminderSet, currentReminderTime, userEmail, task]); 
 
   const setDefaultDateTime = () => {
     const now = new Date();
-    // Default to 1 hour from now, rounded to the nearest 15 minutes (or 00) for better UX
     now.setHours(now.getHours() + 1);
     const minutes = now.getMinutes();
     if (minutes > 0 && minutes < 15) now.setMinutes(15);
@@ -105,8 +96,6 @@ function ReminderForm({
       now.setHours(now.getHours() + 1);
       now.setMinutes(0);
     } else {
-      // minutes is 0, 15, 30, 45
-      // do nothing
     }
 
     const year = now.getFullYear();
@@ -118,7 +107,7 @@ function ReminderForm({
     setDate(`${year}-${month}-${day}`);
     setTime(`${hours}:${mins}`);
     setEmail(userEmail || "");
-    setMessage(""); // Clear message for new reminder
+    setMessage(""); 
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -137,9 +126,7 @@ function ReminderForm({
       return;
     }
 
-    // Combine date and time into a local ISO-like string, then convert to UTC ISO string
-    // The input type="date" and type="time" give values in the browser's local timezone.
-    const localDateTimeString = `${date}T${time}:00`; // Add seconds
+    const localDateTimeString = `${date}T${time}:00`;
     const localDate = new Date(localDateTimeString);
 
     if (isNaN(localDate.getTime())) {
@@ -148,13 +135,10 @@ function ReminderForm({
       return;
     }
 
-    // Convert local date to UTC ISO string for backend
     const reminderTimeUTC = localDate.toISOString();
 
-    // Check if reminder time is in the past (relative to current UTC)
     const nowUTC = new Date();
     if (localDate <= nowUTC) {
-      // Compare localDate (which is parsed in local TZ) to nowUTC
       setError("Reminder time must be in the future.");
       setIsLoading(false);
       return;
@@ -167,7 +151,6 @@ function ReminderForm({
         reminderMessage:
           message.trim() || `Reminder for: ${task?.taskText || "your task"}`,
       });
-      // Parent component will handle closing modal/form
     } catch (err: any) {
       setError(err.message || "Failed to set reminder.");
     } finally {
@@ -180,7 +163,6 @@ function ReminderForm({
     setIsLoading(true);
     try {
       await onClearReminder();
-      // Parent component will handle closing
     } catch (err: any) {
       setError(err.message || "Failed to clear reminder.");
     } finally {

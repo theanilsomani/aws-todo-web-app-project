@@ -1,14 +1,13 @@
-// src/components/TaskList.tsx
 import React from 'react';
-import { Task, TaskUpdatePayload } from '../api/apiService'; // Import Task type
-import TaskItem from './TaskItem'; // Import TaskItem component
+import { Task, TaskUpdatePayload } from '../api/apiService';
+import TaskItem from './TaskItem';
 
 interface TaskListProps {
   tasks: Task[];
   onUpdateTask: (taskId: string, updates: TaskUpdatePayload) => void;
   onDeleteTask: (taskId: string) => void;
-  onOpenReminderModal: (task: Task) => void; // <-- DEFINE PROP TYPE
-  onOpenEditModal: (task: Task) => void;   // <-- DEFINE PROP TYPE
+  onOpenReminderModal: (task: Task) => void; 
+  onOpenEditModal: (task: Task) => void;
 }
 
 
@@ -16,8 +15,8 @@ function TaskList({
     tasks,
     onUpdateTask,
     onDeleteTask,
-    onOpenReminderModal, // <-- DESTRUCTURE
-    onOpenEditModal    // <-- DESTRUCTURE
+    onOpenReminderModal, 
+    onOpenEditModal    
 }: TaskListProps) {
   return (
     <ul className="task-list">
@@ -27,8 +26,8 @@ function TaskList({
           task={task}
           onUpdateTask={onUpdateTask}
           onDeleteTask={onDeleteTask}
-          onOpenReminderModal={onOpenReminderModal} // <-- PASS DOWN
-          onOpenEditModal={onOpenEditModal}       // <-- PASS DOWN
+          onOpenReminderModal={onOpenReminderModal} 
+          onOpenEditModal={onOpenEditModal}   
         />
       ))}
     </ul>
