@@ -1,0 +1,11 @@
+{
+  "AllowOrigins": [
+      "http://localhost:5173",
+      "https://simple-to-do.pages.dev"
+    ],
+  "AllowMethods": ["POST", "GET", "PUT", "DELETE"],
+  "AllowHeaders": ["Content-Type", "Authorization"],
+  "AllowCredentials": false,
+  "ExposeHeaders": [],
+  "MaxAge": 3600
+}
