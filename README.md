@@ -2,7 +2,28 @@
 
 # 📝 Serverless To-Do List Web App (AWS Free Tier)
 
-Welcome to our open-source, full-stack **To-Do List Web App** powered entirely by **AWS Serverless Architecture** — built to stay within the **AWS Always Free Tier** and designed to showcase practical, secure, and scalable cloud development.
+THis is a full-stack **To-Do List Web App** powered entirely by **AWS Serverless Architecture** — built to stay within the **AWS Always Free Tier** and designed to showcase practical, secure, and scalable cloud development.
+
+## 🔗 Live Demo
+
+👉 [Try it Live](https://simple-to-do.pages.dev/)
+
+## 🧰 Tech Stack
+
+- **Frontend:** React, TypeScript, Vite, Cloudflare Pages
+- **Backend:** AWS Lambda, Lambda Function URLs, DynamoDB, Cognito
+- **Reminders & Messaging:** EventBridge Scheduler, SNS
+- **Monitoring & Security:** CloudWatch, IAM Roles & Policies
+
+  ## 🚀 Features
+
+- Sign up, log in, and manage personal to-dos
+- Set **email reminders** for upcoming tasks
+- Secure JWT-based authentication via AWS Cognito
+- Built entirely using **pay-as-you-go serverless services**
+- Frontend deployed on **Cloudflare Pages**
+- **Single-table DynamoDB design** with flexible schema
+- Real-time reminder scheduling via EventBridge
 
 ## 📸 Architecture Overview
 
