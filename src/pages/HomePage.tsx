@@ -5,7 +5,7 @@ function HomePage() {
   return (
     <div className="homepage-container" style={styles.container}>
       <h1 style={styles.title}>Simple. Smart. Serverless.</h1>
-      
+
       <p style={styles.subtitle}>
         This To-Do List Web App helps you manage tasks with reminder emails, powered entirely by AWS Serverless architecture — no servers to manage, and it fits within AWS’s Always Free Tier.
       </p>
@@ -32,6 +32,18 @@ function HomePage() {
       <p style={styles.techInfo}>
         Open-source project showcasing modern cloud development with AWS Serverless stack.
       </p>
+
+      <div style={styles.socialLinks}>
+        <a href="https://www.linkedin.com/in/anil-somani/" target="_blank" rel="noopener noreferrer" style={styles.link}>
+          LinkedIn
+        </a>
+        <a href="https://github.com/theanilsomani" target="_blank" rel="noopener noreferrer" style={styles.link}>
+          GitHub
+        </a>
+        <a href="https://x.com/the_anils" target="_blank" rel="noopener noreferrer" style={styles.link}>
+          X (Twitter)
+        </a>
+      </div>
     </div>
   );
 }
@@ -43,7 +55,7 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     padding: '40px 20px',
-    minHeight: '80vh',
+    minHeight: '90vh',
     textAlign: 'center' as const,
   },
   title: {
@@ -82,7 +94,20 @@ const styles = {
   techInfo: {
     fontSize: '0.85em',
     color: '#aaa',
-  }
+    marginBottom: '20px',
+  },
+  socialLinks: {
+    display: 'flex',
+    gap: '20px',
+    justifyContent: 'center',
+    marginTop: '10px',
+  },
+  link: {
+    color: '#61dafb',
+    textDecoration: 'none',
+    fontWeight: 'bold',
+    fontSize: '1rem',
+  },
 };
 
 export default HomePage;
