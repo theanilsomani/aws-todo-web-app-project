@@ -43,6 +43,9 @@ function HomePage() {
         <a href="https://x.com/the_anils" target="_blank" rel="noopener noreferrer" style={styles.link}>
           X (Twitter)
         </a>
+        <a href="https://github.com/theanilsomani/aws-todo-web-app-project" target="_blank" rel="noopener noreferrer" style={styles.link}>
+          GitHub Repo
+        </a>
       </div>
     </div>
   );
