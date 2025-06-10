@@ -6,7 +6,7 @@ THis is a full-stack **To-Do List Web App** powered entirely by **AWS Serverless
 
 ## 🔗 Live Demo
 
-👉 [Try it Live](https://simple-to-do.pages.dev/)
+👉 [Try it Live](https://simple-to-do.pages.dev/home)
 
 ## 🧰 Tech Stack
 
