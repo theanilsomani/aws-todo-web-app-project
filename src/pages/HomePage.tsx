@@ -1,8 +1,5 @@
-// src/pages/HomePage.tsx
 import React from 'react';
 import { Link } from 'react-router-dom';
-// Optional: Import some specific styles for the homepage
-// import '../styles/HomePage.css';
 
 function HomePage() {
   return (
@@ -26,11 +23,10 @@ function HomePage() {
   );
 }
 
-// Basic inline styles (consider moving to a CSS file)
 const styles = {
     container: {
         display: 'flex',
-        flexDirection: 'column' as 'column', // Explicitly type for CSSProperties
+        flexDirection: 'column' as 'column', 
         alignItems: 'center',
         justifyContent: 'center',
         padding: '40px 20px',
@@ -40,7 +36,7 @@ const styles = {
     title: {
         fontSize: '2.5rem',
         marginBottom: '15px',
-        color: '#646cff', // Example color
+        color: '#646cff', 
     },
     subtitle: {
         fontSize: '1.2rem',
@@ -62,10 +58,6 @@ const styles = {
         color: '#aaa',
      }
 };
-
-
-// Light mode adaptation (inline styles don't easily support this, better with CSS)
-// @media (prefers-color-scheme: light) { ... }
 
 
 export default HomePage;

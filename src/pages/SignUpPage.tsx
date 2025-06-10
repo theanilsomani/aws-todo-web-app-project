@@ -1,6 +1,4 @@
-// src/pages/SignUpPage.tsx
 import React, { useState } from 'react';
-// Import v6+ specific function
 import { signUp } from 'aws-amplify/auth';
 import { useNavigate, Link } from 'react-router-dom';
 import '../styles/Form.css';
@@ -24,16 +22,13 @@ function SignUpPage() {
 
     try {
       console.log("Attempting sign up (v6)...");
-      // Use imported signUp function
       const { isSignUpComplete, userId, nextStep } = await signUp({
-        username: email, // Use email as the username
+        username: email, 
         password: password,
         options: {
           userAttributes: {
-            email: email, // Pass email attribute
+            email: email, 
           },
-          // Enable auto sign in after confirmation (handled by confirm step usually)
-          // autoSignIn: true // Let's rely on confirm step then login
         }
       });
 
@@ -41,15 +36,12 @@ function SignUpPage() {
 
       if (nextStep?.signUpStep === 'CONFIRM_SIGN_UP') {
          console.log("Sign up requires confirmation.");
-         // Pass username (email) to confirmation page
          navigate('/confirm-signup', { state: { username: email } });
       } else if (isSignUpComplete) {
-          // Should generally not happen if confirmation is required
            console.log("Sign up complete without confirmation? Unexpected.");
            alert("Sign up complete! Please login.");
            navigate('/login');
       } else {
-          // Handle other potential next steps?
            console.warn("Unhandled signUp next step:", nextStep?.signUpStep);
            setError(`Sign up requires additional step: ${nextStep?.signUpStep}`);
            setIsLoading(false);
@@ -66,7 +58,6 @@ function SignUpPage() {
     }
   };
 
-  // ... (rest of the JSX form remains the same) ...
    return (
         <div className="form-container">
           <h2>Sign Up</h2>

@@ -1,4 +1,3 @@
-/* src/styles/Todo.css */
 
 /* Add Task Form */
 .add-task-form {
@@ -9,9 +8,9 @@
   }
   
   .add-task-form input[type="text"] {
-    flex-grow: 1; /* Take available space */
+    flex-grow: 1; 
     margin-right: 10px;
-    margin-bottom: 0; /* Remove bottom margin */
+    margin-bottom: 0; 
   }
   
   /* Task List */
@@ -36,7 +35,7 @@
   }
   
   .task-item.completed {
-    background-color: #4a4a4a; /* Slightly different background */
+    background-color: #4a4a4a;
   }
   
   .task-item.completed .task-text {
@@ -47,21 +46,21 @@
   .task-item input[type="checkbox"] {
     margin-right: 10px;
     cursor: pointer;
-    width: 18px; /* Make checkbox slightly larger */
+    width: 18px;
     height: 18px;
   }
   
   .task-content {
       display: flex;
       align-items: center;
-      flex-grow: 1; /* Allow text to take space */
-      margin-right: 10px; /* Space before delete button */
+      flex-grow: 1; 
+      margin-right: 10px; 
   }
   
   .task-text {
-    flex-grow: 1; /* Allow text to expand */
+    flex-grow: 1; 
     text-align: left;
-    word-break: break-word; /* Prevent long text overflow */
+    word-break: break-word;
   }
   
   .delete-button {

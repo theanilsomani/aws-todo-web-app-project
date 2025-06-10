@@ -1,27 +1,25 @@
-// src/pages/TodoListPage.tsx
 import React, { useState, useEffect, useCallback } from "react";
-import { signOut } from "aws-amplify/auth"; // Using v6 import
+import { signOut } from "aws-amplify/auth";
 import {
   listTasksAPI,
   createTaskAPI,
   updateTaskAPI,
   deleteTaskAPI,
-  setTaskReminderAPI, // Import new API
+  setTaskReminderAPI,
   Task,
   TaskUpdatePayload,
-  ReminderPayload, // Make sure this is exported from apiService.ts
+  ReminderPayload,
 } from "../api/apiService";
 import AddTaskForm from "../components/AddTaskForm";
 import TaskList from "../components/TaskList";
-import ReminderForm from "../components/ReminderForm"; // Import ReminderForm
-import "../styles/Todo.css"; // Import todo styles
+import ReminderForm from "../components/ReminderForm"; 
+import "../styles/Todo.css"; 
 
 interface TodoListPageProps {
   onSignOut: () => void;
   userEmail?: string;
 }
 
-// --- Simple Modal (can be moved to its own file for better organization) ---
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -30,7 +28,6 @@ interface ModalProps {
 }
 const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children, title }) => {
   if (!isOpen) return null;
-  // Basic modal styling, improve as needed
   const modalOverlayStyle: React.CSSProperties = {
     position: "fixed",
     top: 0,
@@ -44,17 +41,17 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children, title }) => {
     zIndex: 1000,
   };
   const modalContentStyle: React.CSSProperties = {
-    background: "#2c2c2c", // Dark background for modal content
-    color: "white", // Text color for modal content
+    background: "#2c2c2c", 
+    color: "white",
     padding: "25px",
     borderRadius: "8px",
     minWidth: "300px",
     maxWidth: "90%",
-    width: "500px", // Responsive width
+    width: "500px", 
     boxShadow: "0 5px 15px rgba(0,0,0,0.3)",
     zIndex: 1001,
     maxHeight: "80vh",
-    overflowY: "auto", // Scrollable if content is too long
+    overflowY: "auto", 
   };
   const modalTitleStyle: React.CSSProperties = {
     marginTop: 0,
@@ -67,23 +64,19 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children, title }) => {
   return (
     <div style={modalOverlayStyle} onClick={onClose}>
       {" "}
-      {/* Close on overlay click */}
       <div style={modalContentStyle} onClick={(e) => e.stopPropagation()}>
         {" "}
-        {/* Prevent closing when clicking inside content */}
         {title && <h3 style={modalTitleStyle}>{title}</h3>}
         {children}
       </div>
     </div>
   );
 };
-// --- End Simple Modal ---
 
-// --- Simple Edit Task Text Modal ---
 interface EditTaskTextModalProps {
   isOpen: boolean;
   task: Task | null;
-  onSave: (taskId: string, newText: string) => Promise<void>; // Make onSave async
+  onSave: (taskId: string, newText: string) => Promise<void>;
   onClose: () => void;
 }
 const EditTaskTextModal: React.FC<EditTaskTextModalProps> = ({
@@ -99,7 +92,7 @@ const EditTaskTextModal: React.FC<EditTaskTextModalProps> = ({
   useEffect(() => {
     if (task) {
       setText(task.taskText);
-      setError(""); // Clear previous errors when modal opens with a new task
+      setError("");
     }
   }, [task]);
 
@@ -122,7 +115,6 @@ const EditTaskTextModal: React.FC<EditTaskTextModalProps> = ({
     setError("");
     try {
       await onSave(task.taskId, trimmedText);
-      // onClose(); // Parent will handle closing on successful save via handleUpdateTask
     } catch (err: any) {
       setError(err.message || "Failed to save task text.");
     } finally {
@@ -193,12 +185,11 @@ const EditTaskTextModal: React.FC<EditTaskTextModalProps> = ({
     </Modal>
   );
 };
-// --- End Edit Task Text Modal ---
 
 function TodoListPage({ onSignOut, userEmail }: TodoListPageProps) {
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true); // For initial task load
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false); // For add/update/delete operations
+  const [isLoading, setIsLoading] = useState<boolean>(true); 
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false); 
   const [error, setError] = useState<string>("");
 
   const [showReminderModal, setShowReminderModal] = useState<boolean>(false);
@@ -207,14 +198,12 @@ function TodoListPage({ onSignOut, userEmail }: TodoListPageProps) {
   const [showEditTextModal, setShowEditTextModal] = useState<boolean>(false);
   const [taskForEditText, setTaskForEditText] = useState<Task | null>(null);
 
-  // Memoized fetchTasks to prevent re-creation on every render unless dependencies change
   const fetchTasks = useCallback(async (showFullLoadingSpinner = true) => {
     if (showFullLoadingSpinner) setIsLoading(true);
-    setError(""); // Clear previous errors
+    setError(""); 
     try {
       console.log("Fetching tasks...");
       const fetchedTasks = await listTasksAPI();
-      // Sort tasks by creation date, newest first (optional, can also be done on backend)
       fetchedTasks.sort(
         (a, b) =>
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -225,30 +214,27 @@ function TodoListPage({ onSignOut, userEmail }: TodoListPageProps) {
       console.error("Error fetching tasks:", err);
       setError(err.message || "Failed to fetch tasks. Please try again.");
       if (err.message === "User not authenticated") {
-        handleForceSignOut(); // Call the sign out handler
+        handleForceSignOut(); 
       }
     } finally {
       if (showFullLoadingSpinner) setIsLoading(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Include handleForceSignOut if it's defined outside and used, or make it internal
+  }, []);
 
-  // Forced sign out for API authentication errors
   const handleForceSignOut = useCallback(async () => {
     console.log("Forcing sign out due to API auth error...");
     try {
-      await signOut(); // AWS Amplify signOut
+      await signOut();
     } catch (e) {
       console.error("Error during forced signout from API error:", e);
     }
-    onSignOut(); // Notify App.tsx to update global auth state and redirect | eslint-disable-next-line react-hooks/exhaustive-deps
+    onSignOut();
   }, [onSignOut]);
 
   useEffect(() => {
-    fetchTasks(); // Initial fetch
-  }, [fetchTasks]); // Dependency array for fetchTasks
+    fetchTasks(); 
+  }, [fetchTasks]); 
 
-  // --- Task CRUD Handlers ---
   const handleAddTask = async (taskText: string): Promise<boolean> => {
     setError("");
     setIsSubmitting(true);
@@ -256,7 +242,7 @@ function TodoListPage({ onSignOut, userEmail }: TodoListPageProps) {
     try {
       await createTaskAPI(taskText);
       console.log("Task added via API, re-fetching list...");
-      await fetchTasks(false); // Re-fetch without full loading spinner for smoother UI
+      await fetchTasks(false);
       return true;
     } catch (err: any) {
       console.error("Error adding task:", err);
@@ -276,8 +262,7 @@ function TodoListPage({ onSignOut, userEmail }: TodoListPageProps) {
     setIsSubmitting(true);
     console.log(`Updating task ${taskId}:`, updates);
 
-    const originalTasks = [...tasks]; // For potential revert
-    // Optimistic UI Update
+    const originalTasks = [...tasks];
     setTasks((prevTasks) =>
       prevTasks.map((task) =>
         task.taskId === taskId
@@ -289,7 +274,6 @@ function TodoListPage({ onSignOut, userEmail }: TodoListPageProps) {
     try {
       await updateTaskAPI(taskId, updates);
       console.log("Task updated successfully via API.");
-      // If text was updated from modal, close it
       if (
         showEditTextModal &&
         taskForEditText?.taskId === taskId &&
@@ -297,12 +281,10 @@ function TodoListPage({ onSignOut, userEmail }: TodoListPageProps) {
       ) {
         handleCloseEditModal();
       }
-      // Optionally, re-fetch for full consistency, but optimistic update might be enough
-      // await fetchTasks(false);
     } catch (err: any) {
       console.error("Error updating task:", err);
       setError(err.message || "Failed to update task.");
-      setTasks(originalTasks); // Revert optimistic update on error
+      setTasks(originalTasks);
       if (err.message === "User not authenticated") handleForceSignOut();
     } finally {
       setIsSubmitting(false);
@@ -314,7 +296,7 @@ function TodoListPage({ onSignOut, userEmail }: TodoListPageProps) {
     setIsSubmitting(true);
     console.log("Deleting task:", taskId);
 
-    const originalTasks = [...tasks]; // For potential revert
+    const originalTasks = [...tasks];
     // Optimistic UI Update
     setTasks((prevTasks) => prevTasks.filter((task) => task.taskId !== taskId));
 
@@ -324,7 +306,7 @@ function TodoListPage({ onSignOut, userEmail }: TodoListPageProps) {
     } catch (err: any) {
       console.error("Error deleting task:", err);
       setError(err.message || "Failed to delete task.");
-      setTasks(originalTasks); // Revert optimistic update
+      setTasks(originalTasks);
       if (err.message === "User not authenticated") handleForceSignOut();
     } finally {
       setIsSubmitting(false);
@@ -332,12 +314,11 @@ function TodoListPage({ onSignOut, userEmail }: TodoListPageProps) {
   };
 
   const handleSignOutClick = async () => {
-    setError(""); // Clear errors on intentional sign out
-    setIsSubmitting(true); // Show loading state for sign out
+    setError(""); 
+    setIsSubmitting(true);
     console.log("Signing out (v6)...");
     try {
       await signOut();
-      // onSignOut(); // Let Hub listener in App.tsx handle state and navigation
     } catch (error: any) {
       console.error("Error signing out (v6): ", error);
       setError("Failed to sign out.");
@@ -346,7 +327,6 @@ function TodoListPage({ onSignOut, userEmail }: TodoListPageProps) {
     }
   };
 
-  // --- Reminder Modal Handlers ---
   const handleOpenReminderModal = (task: Task) => {
     console.log("Opening reminder modal for task:", task); // DEBUG
     setTaskForReminder(task);
@@ -371,14 +351,11 @@ function TodoListPage({ onSignOut, userEmail }: TodoListPageProps) {
       };
       await setTaskReminderAPI(payload);
       console.log("Reminder set/updated, re-fetching tasks for updated info.");
-      await fetchTasks(false); // Re-fetch to get updated task with reminder info
+      await fetchTasks(false);
       handleCloseReminderModal();
     } catch (err: any) {
       console.error("Error setting reminder:", err);
-      // The ReminderForm itself will show the error, so we don't set global error here unless desired
-      // setError(err.message || "Failed to set reminder.");
       if (err.message === "User not authenticated") handleForceSignOut();
-      // Let ReminderForm handle its own error display
     } finally {
       setIsSubmitting(false);
     }
@@ -393,13 +370,11 @@ function TodoListPage({ onSignOut, userEmail }: TodoListPageProps) {
         clearReminder: true,
       });
       console.log("Reminder cleared, re-fetching tasks.");
-      await fetchTasks(false); // Re-fetch
+      await fetchTasks(false); 
       handleCloseReminderModal();
     } catch (err: any) {
       console.error("Error clearing reminder:", err);
-      // setError(err.message || "Failed to clear reminder.");
       if (err.message === "User not authenticated") handleForceSignOut();
-      // Let ReminderForm handle its own error display if needed
     } finally {
       setIsSubmitting(false);
     }
@@ -407,7 +382,7 @@ function TodoListPage({ onSignOut, userEmail }: TodoListPageProps) {
 
   // --- Edit Task Text Modal Handlers ---
   const handleOpenEditModal = (task: Task) => {
-    console.log("Opening edit text modal for task:", task); // DEBUG
+    console.log("Opening edit text modal for task:", task);
     setTaskForEditText(task);
     setShowEditTextModal(true);
   };
@@ -416,13 +391,10 @@ function TodoListPage({ onSignOut, userEmail }: TodoListPageProps) {
     setTaskForEditText(null);
   };
   const handleSaveTaskText = async (taskId: string, newText: string) => {
-    // handleUpdateTask will be called, which includes closing the modal
     await handleUpdateTask(taskId, { taskText: newText });
   };
 
-  // --- Render Logic ---
   if (isLoading) {
-    // Only show full page loading spinner on initial load
     return (
       <div
         className="loading-container"
@@ -465,7 +437,7 @@ function TodoListPage({ onSignOut, userEmail }: TodoListPageProps) {
 
       <AddTaskForm onAddTask={handleAddTask} />
 
-      {tasks.length === 0 && !isLoading ? ( // Check !isLoading here to avoid flash of "No tasks"
+      {tasks.length === 0 && !isLoading ? (
         <p style={{ marginTop: "20px" }}>No tasks yet. Add one above!</p>
       ) : (
         <TaskList
@@ -477,8 +449,7 @@ function TodoListPage({ onSignOut, userEmail }: TodoListPageProps) {
         />
       )}
 
-      {/* Reminder Modal */}
-      {taskForReminder && ( // Conditionally render ReminderForm only when taskForReminder is not null
+      {taskForReminder && (
         <Modal
           isOpen={showReminderModal}
           onClose={handleCloseReminderModal}
@@ -496,7 +467,6 @@ function TodoListPage({ onSignOut, userEmail }: TodoListPageProps) {
         </Modal>
       )}
 
-      {/* Edit Task Text Modal */}
       {taskForEditText && (
         <EditTaskTextModal
           isOpen={showEditTextModal}

@@ -1,12 +1,10 @@
-// src/pages/ConfirmSignUpPage.tsx
 import React, { useState, useEffect } from 'react';
-// Import v6+ specific functions
 import { confirmSignUp, resendSignUpCode } from 'aws-amplify/auth';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import '../styles/Form.css';
 
 function ConfirmSignUpPage() {
-  const [username, setUsername] = useState(''); // This IS the email used for signup
+  const [username, setUsername] = useState('');
   const [code, setCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -34,7 +32,6 @@ function ConfirmSignUpPage() {
 
     try {
       console.log(`Attempting to confirm sign up for ${username} (v6)...`);
-      // Use imported confirmSignUp
       const { isSignUpComplete, nextStep } = await confirmSignUp({
           username: username,
           confirmationCode: code,
@@ -47,7 +44,6 @@ function ConfirmSignUpPage() {
          alert("Account confirmed successfully! Please login.");
          navigate('/login');
       } else {
-           // Handle other next steps? Should generally be complete here.
            console.warn("Confirmation might require additional step?", nextStep?.signUpStep);
            setError(`Confirmation requires step: ${nextStep?.signUpStep}`);
            setIsLoading(false);
@@ -59,7 +55,7 @@ function ConfirmSignUpPage() {
        } else if (err.name === 'ExpiredCodeException') {
            setError('Confirmation code has expired. Please request a new one.');
        } else if (err.name === 'UserNotFoundException') {
-            setError('User not found. Please sign up again or contact support.'); // Less likely here
+            setError('User not found. Please sign up again or contact support.');
        } else {
            setError(err.message || 'An error occurred during confirmation.');
        }
@@ -76,7 +72,6 @@ function ConfirmSignUpPage() {
         setError(null);
         setResendStatus('Sending...');
         try {
-            // Use imported resendSignUpCode
             await resendSignUpCode({ username: username });
             setResendStatus('Confirmation code resent successfully. Check your email.');
         } catch (err: any) {
@@ -88,7 +83,6 @@ function ConfirmSignUpPage() {
         }
     };
 
-  // ... (rest of the JSX form remains the same) ...
     return (
         <div className="form-container">
           <h2>Confirm Sign Up</h2>
