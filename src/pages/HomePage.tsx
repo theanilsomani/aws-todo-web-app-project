@@ -1,7 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 function HomePage() {
+  useEffect(() => {
+    document.title = 'AWS Serverless to-do app';
+  }, []);
+
   return (
     <div className="homepage-container" style={styles.container}>
       <h1 style={styles.title}>Simple. Smart. Serverless.</h1>
@@ -53,6 +57,8 @@ function HomePage() {
 
 const styles = {
   container: {
+    backgroundColor: '#1e1e1e', // Ensures readability in light browser theme
+    color: 'white',
     display: 'flex',
     flexDirection: 'column' as const,
     alignItems: 'center',
@@ -96,7 +102,7 @@ const styles = {
   },
   techInfo: {
     fontSize: '0.85em',
-    color: '#aaa',
+    color: '#ccc',
     marginBottom: '20px',
   },
   socialLinks: {
