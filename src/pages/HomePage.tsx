@@ -11,7 +11,7 @@ function HomePage() {
       <h1 style={styles.title}>Simple. Smart. Serverless.</h1>
 
       <p style={styles.subtitle}>
-        This To-Do List Web App helps you manage tasks with reminder emails, powered entirely by AWS Serverless architecture — no servers to manage, and it fits within AWS’s Always Free Tier.
+        This To-Do List Web App helps you manage tasks with reminder emails, powered entirely by AWS Serverless architecture, no servers to manage, and it fits within AWS’s Always Free Tier.
       </p>
 
       <div style={styles.buttonGroup}>
@@ -24,7 +24,7 @@ function HomePage() {
       </div>
 
       <p style={styles.description}>
-        Create tasks, set reminders, and get notified — all effortlessly, securely, and for free. Built with React, TypeScript, Vite, Node.js, and AWS services including Lambda, DynamoDB, Cognito, SNS, EventBridge, CloudWatch, and IAM.
+        Create tasks, set reminders, and get notified, all effortlessly, securely, and for free. Built with React, TypeScript, Vite, Node.js, and AWS services including Lambda, DynamoDB, Cognito, SNS, EventBridge, CloudWatch, and IAM.
       </p>
 
       <img
